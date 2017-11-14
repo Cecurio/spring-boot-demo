@@ -1,0 +1,61 @@
+package cn.cecurio.ch8_2.service.impl;
+
+import cn.cecurio.ch8_2.dao.UserJpaRepository;
+import cn.cecurio.ch8_2.dao.UserRepository;
+import cn.cecurio.ch8_2.domain.User;
+import cn.cecurio.ch8_2.service.IUserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * @author: Cecurio
+ * @create: 2017-11-11 15:59
+ * @desc:
+ **/
+@Service
+@Transactional
+public class UserServiceImpl implements IUserService{
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public List<User> findAll() {
+        return userJpaRepository.findAll();
+    }
+
+    @Override
+    public void saveUser(User book) {
+        userJpaRepository.save(book);
+    }
+
+    @Override
+    @Cacheable("users")
+    public User findOne(long id) {
+        System.out.println("Cached Pages");
+        return userJpaRepository.findOne(id);
+    }
+
+    @Override
+    public void delete(long id) {
+        userJpaRepository.delete(id);
+    }
+
+    @Override
+    public List<User> findByName(String name) {
+        List<User> userList1 = userRepository.findByName1(name);
+        List<User> userList2 = userRepository.findByName2(name);
+        List<User> userList3 = userRepository.findByNameAndAddress(name, "3");
+        System.out.println("userList1:" + userList1);
+        System.out.println("userList2:" + userList2);
+        System.out.println("userList3:" + userList3);
+        return userRepository.findByName(name);
+    }
+}
